@@ -1,11 +1,12 @@
 import 'package:face_detection_first/util/coordinates_painter.dart';
 import 'package:flutter/material.dart';
-import 'package:google_mlkit_face_detection/google_mlkit_face_detection.dart';
+import 'package:google_ml_vision/google_ml_vision.dart';
+import 'package:google_ml_kit/google_ml_kit.dart' as mlkit;
 
 class FaceDetectorPainter extends CustomPainter {
   final List<Face> faces;
   final Size absoluteImageSize;
-  final InputImageRotation rotation;
+  final mlkit.InputImageRotation rotation;
 
   FaceDetectorPainter({
     required this.faces,
@@ -53,15 +54,16 @@ class FaceDetectorPainter extends CustomPainter {
 
       /// draw the blue circle for detected points of the face
       void paintContour(final FaceContourType type) {
-        final faceContour = face.contours[type];
-        if (faceContour?.points != null) {
-          for (final point in faceContour!.points) {
+        final faceContour = face.getContour(type);
+        // contours[type];
+        if (faceContour?.positionsList != null) {
+          for (final point in faceContour!.positionsList) {
             canvas.drawCircle(
               Offset(
                   translateX(
-                      point.x.toDouble(), rotation, size, absoluteImageSize),
+                      point.dx.toDouble(), rotation, size, absoluteImageSize),
                   translateY(
-                      point.y.toDouble(), rotation, size, absoluteImageSize)),
+                      point.dy.toDouble(), rotation, size, absoluteImageSize)),
               1.0,
               paint,
             );
@@ -69,21 +71,21 @@ class FaceDetectorPainter extends CustomPainter {
         }
       }
 
-      paintContour(FaceContourType.face);
-      paintContour(FaceContourType.leftEyebrowTop);
-      paintContour(FaceContourType.leftEyebrowBottom);
-      paintContour(FaceContourType.rightEyebrowTop);
-      paintContour(FaceContourType.rightEyebrowBottom);
-      paintContour(FaceContourType.leftEye);
-      paintContour(FaceContourType.rightEye);
-      paintContour(FaceContourType.upperLipTop);
-      paintContour(FaceContourType.upperLipBottom);
-      paintContour(FaceContourType.lowerLipTop);
-      paintContour(FaceContourType.lowerLipBottom);
-      paintContour(FaceContourType.noseBridge);
-      paintContour(FaceContourType.noseBottom);
-      paintContour(FaceContourType.leftCheek);
-      paintContour(FaceContourType.rightCheek);
+      // paintContour(FaceContourType.face);
+      // paintContour(FaceContourType.leftEyebrowTop);
+      // paintContour(FaceContourType.leftEyebrowBottom);
+      // paintContour(FaceContourType.rightEyebrowTop);
+      // paintContour(FaceContourType.rightEyebrowBottom);
+      // paintContour(FaceContourType.leftEye);
+      // paintContour(FaceContourType.rightEye);
+      // paintContour(FaceContourType.upperLipTop);
+      // paintContour(FaceContourType.upperLipBottom);
+      // paintContour(FaceContourType.lowerLipTop);
+      // paintContour(FaceContourType.lowerLipBottom);
+      // paintContour(FaceContourType.noseBridge);
+      // paintContour(FaceContourType.noseBottom);
+      paintContour(FaceContourType.allPoints);
+      // paintContour(FaceContourType.rightCheek);
     }
   }
 

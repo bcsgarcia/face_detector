@@ -5,6 +5,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_mlkit_face_detection/google_mlkit_face_detection.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:google_ml_vision/google_ml_vision.dart';
 
 import 'main.dart';
 import 'util/screen_mode.dart';
@@ -13,7 +14,10 @@ class CameraView extends StatefulWidget {
   final String title;
   final CustomPaint? customPaint;
   final String? text;
-  final Function(InputImage inputImage) onImage;
+  final Function(
+    GoogleVisionImage googleVisionImage,
+    InputImage inputImage,
+  ) onImage;
   final CameraLensDirection initialDirection;
 
   const CameraView({
@@ -146,7 +150,31 @@ class _CameraViewState extends State<CameraView> {
       inputImageData: inputImageData,
     );
 
-    widget.onImage(inputImage);
+    /// vision
+
+    final googleVisionPlaneData = image.planes.map(
+      (final Plane plane) {
+        return GoogleVisionImagePlaneMetadata(
+          bytesPerRow: plane.bytesPerRow,
+          height: plane.height,
+          width: plane.width,
+        );
+      },
+    ).toList();
+
+    final googleVisionImageMetadata = GoogleVisionImageMetadata(
+      size: imageSize,
+      rotation: ImageRotation.rotation0,
+      rawFormat: image.format.raw,
+      planeData: googleVisionPlaneData,
+    );
+
+    final googleVisionImage = GoogleVisionImage.fromBytes(
+      bytes,
+      googleVisionImageMetadata,
+    );
+
+    widget.onImage(googleVisionImage, inputImage);
   }
 
   @override
@@ -290,7 +318,10 @@ class _CameraViewState extends State<CameraView> {
 
     _path = path;
     final inputImage = InputImage.fromFilePath(path);
-    widget.onImage(inputImage);
+
+    final imageFile = File(path);
+    final GoogleVisionImage visionImage = GoogleVisionImage.fromFile(imageFile);
+    widget.onImage(visionImage, inputImage);
   }
 
   Widget _liveBody() {
